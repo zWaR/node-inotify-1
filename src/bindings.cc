@@ -8,11 +8,11 @@
 #define BUF_LEN        (1024 * (EVENT_SIZE + 16))
 
 namespace NodeInotify {
-	void Inotify::Initialize(Handle<Object> exports) {
+	void Inotify::Initialize(Local<Object> exports) {
 		Local<FunctionTemplate> t = Nan::New<FunctionTemplate>(New);
 		t->SetClassName(Nan::New<String>("Inotify").ToLocalChecked());
 		t->InstanceTemplate()->SetInternalFieldCount(1);
-
+		
 		Nan::SetPrototypeMethod(t, "addWatch", Inotify::AddWatch);
 		Nan::SetPrototypeMethod(t, "removeWatch", Inotify::RemoveWatch);
 		Nan::SetPrototypeMethod(t, "close", Inotify::Close);
@@ -20,7 +20,10 @@ namespace NodeInotify {
 		Local<ObjectTemplate> object_tmpl = t->InstanceTemplate();
 		Nan::SetAccessor(object_tmpl, Nan::New<String>("persistent").ToLocalChecked(), Inotify::GetPersistent);
 
-		Local<Function> fn = t->GetFunction();
+		Isolate* isolate = v8::Isolate::GetCurrent();
+		Local<Context> context = Nan::GetCurrentContext();	
+		Local<Function> fn = t->GetFunction(context).ToLocalChecked();
+
 		exports->Set(Nan::New<String>("Inotify").ToLocalChecked(), fn);
 
 		// Constants initialization
@@ -143,33 +146,43 @@ namespace NodeInotify {
 			return Nan::ThrowTypeError("You must specify an object as first argument");
 		}
 
-		Local<Object> args_ = info[0]->ToObject();
+		Local<Context> context = Nan::GetCurrentContext();
+		Local<Object> args_ = info[0]->ToObject(context).ToLocalChecked();
 
 		Local<String> path_sym = Nan::New<String>("path").ToLocalChecked();
-		if (!args_->Has(path_sym)) {
+		Maybe<bool> has_path_sym_bool = args_->Has(context, path_sym);
+		bool* condition;
+		has_path_sym_bool.To(condition);
+		if (!condition) {
 			return Nan::ThrowTypeError("You must specify a path to watch for events");
 		}
 
 		Local<String> callback_sym = Nan::New<String>("callback").ToLocalChecked();
-		if (!args_->Has(callback_sym) ||
+		Maybe<bool> callback_sym_bool = args_->Has(context, callback_sym);
+		callback_sym_bool.To(condition);
+		if (!condition ||
 			!args_->Get(callback_sym)->IsFunction()) {
 			return Nan::ThrowTypeError("You must specify a callback function");
 		}
 
 		Local<String> watch_for_sym = Nan::New<String>("watch_for").ToLocalChecked();
-		if (!args_->Has(watch_for_sym)) {
+		Maybe<bool> watch_for_sym_bool = args_->Has(context, watch_for_sym);
+		watch_for_sym_bool.To(condition);
+		if (!condition) {
 			mask |= IN_ALL_EVENTS;
 		} else {
 			if (!args_->Get(watch_for_sym)->IsInt32()) {
 				return Nan::ThrowTypeError("You must specify OR'ed set of events");
 			}
-			mask |= args_->Get(watch_for_sym)->Int32Value();
+			uint32_t mask_local = 0;
+			args_->Get(watch_for_sym)->Uint32Value(context).To(&mask_local);
+			mask |= mask_local;
 			if (mask == 0) {
 				return Nan::ThrowTypeError("You must specify OR'ed set of events");
 			}
 	   }
-
-		String::Utf8Value path(args_->Get(path_sym));
+		Isolate* isolate = v8::Isolate::GetCurrent();
+		String::Utf8Value path(isolate, args_->Get(path_sym));
 
 		Inotify *inotify = Nan::ObjectWrap::Unwrap<Inotify>(info.This());
 
@@ -192,7 +205,9 @@ namespace NodeInotify {
 		if(info.Length() == 0 || !info[0]->IsInt32()) {
 			return Nan::ThrowTypeError("You must specify a valid watcher descriptor as argument");
 		}
-		watch = info[0]->Int32Value();
+		Local<Context> context = Nan::GetCurrentContext();
+		uint32_t watch_local = 0;
+		watch = info[0]->Uint32Value(context).To(&watch_local);
 
 		Inotify *inotify = Nan::ObjectWrap::Unwrap<Inotify>(info.This());
 
@@ -253,6 +268,7 @@ namespace NodeInotify {
 		Nan::TryCatch try_catch;
 
 		int sz = 0;
+		Local<Context> context = Nan::GetCurrentContext();	
 		while ((sz = read(inotify->fd, buffer, BUF_LEN)) > 0) {
 			struct inotify_event *event;
 			for (unsigned int i = 0; i <= (sz-EVENT_SIZE); i += (EVENT_SIZE + event->len)) {
@@ -282,7 +298,7 @@ namespace NodeInotify {
 				if(event->mask & IN_IGNORED) {
 					//deleting callback because the watch was removed
 					Local<Value> wd = Nan::New<Integer>(event->wd);
-					handle->Delete(wd->ToString());
+					handle->Delete(context, wd->ToString(context).ToLocalChecked());
 				}
 
 				if (try_catch.HasCaught()) {

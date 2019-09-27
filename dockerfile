@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:stretch-slim
 
 ENV NPM_CONFIG_LOGLEVEL warn
 

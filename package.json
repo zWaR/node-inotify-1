@@ -1,8 +1,8 @@
 {
   "name": "inotify",
-  "version": "1.4.6",
-  "author": "Camilo Aguilar <camilo.aguilar@gmail.com>",
-  "email": "camilo.aguilar@gmail.com",
+  "version": "2.0.0",
+  "author": "Lazar Dilov <ldilov@yahoo.com>",
+  "email": "ldilov@yahoo.com",
   "keywords": [
     "inotify",
     "watch",
@@ -11,20 +11,20 @@
     "watch directories"
   ],
   "license": "MIT",
-  "description": "inotify bindings for v8 javascript engine",
+  "description": "inotify bindings for the new v8 javascript engine",
   "repository": {
     "type": "git",
-    "url": "http://github.com/c4milo/node-inotify"
+    "url": "http://github.com/ldilov/node-inotify"
   },
   "os": [
     "linux"
   ],
   "engines": {
-    "node": ">=0.8"
+    "node": ">=10"
   },
   "main": "inotify",
   "dependencies": {
-    "bindings": "^1.3.1",
+    "bindings": "^1.5.0",
     "nan": "^2.12.1"
   },
   "scripts": {
