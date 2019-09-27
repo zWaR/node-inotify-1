@@ -1,7 +1,8 @@
 sudo: required
+dist: bionic
 language: node_js
 env:
-  - CXX="g++-7.0"
+  - CXX="g++-7"
 node_js:
   - "12"
   - "11"
@@ -9,9 +10,10 @@ node_js:
 
 addons:
   apt:
+    update: true
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - g++-7.0
-    - gcc-7.0
+    - g++-7
+    - gcc-7
 
