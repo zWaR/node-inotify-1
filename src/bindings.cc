@@ -151,7 +151,7 @@ namespace NodeInotify {
 
 		Local<String> path_sym = Nan::New<String>("path").ToLocalChecked();
 		Maybe<bool> has_path_sym_bool = args_->Has(context, path_sym);
-		bool* condition;
+		bool* condition = new bool();
 		has_path_sym_bool.To(condition);
 		if (!condition) {
 			return Nan::ThrowTypeError("You must specify a path to watch for events");
