@@ -1,5 +1,5 @@
 # node-inotify - monitoring file system events in GNU/Linux with [NodeJS][nodejs_home]
-[![Build Status](https://travis-ci.org/c4milo/node-inotify.svg?branch=master)](https://travis-ci.org/c4milo/node-inotify)
+[![Build Status](https://travis-ci.org/ldilov/node-inotify.svg?branch=master)](https://travis-ci.org/ldilov/node-inotify)
 
 The inotify API provides a mechanism for monitoring file system events.
 Inotify can be used to monitor individual files, or to monitor directories.
@@ -19,7 +19,7 @@ itself, and for files inside the directory. [(ref: GNU/Linux Manual)][inotify.7]
 
 ```shell
 $ npm install node-gyp -g
-$ git clone git://github.com/c4milo/node-inotify.git
+$ git clone git://github.com/ldilov/node-inotify.git
 $ cd node-inotify
 $ node-gyp rebuild
 ```

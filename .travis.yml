@@ -1,25 +1,17 @@
 sudo: required
 language: node_js
 env:
-  - CXX="g++-4.8"
+  - CXX="g++-7.0"
 node_js:
+  - "12"
   - "11"
-  - "10"
-  - "8"
-  - "7"
-  - "6"
-  - "5"
-  - "5.1"
-  - "4"
-  - "4.2"
-  - "4.1"
-  - "4.0"
+
 
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - g++-4.8
-    - gcc-4.8
+    - g++-7.0
+    - gcc-7.0
 
