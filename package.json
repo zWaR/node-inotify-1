@@ -20,12 +20,12 @@
     "linux"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=8"
   },
   "main": "inotify",
   "dependencies": {
     "bindings": "~1.5.0",
-    "nan": "^2.12.1"
+    "nan": "^2.14.0"
   },
   "scripts": {
     "test": "node-gyp configure build"
