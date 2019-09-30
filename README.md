@@ -64,7 +64,7 @@ The `event.name` property is only present when an event is returned for a file i
 ## Example of use
 
 ```javascript
-    var Inotify = require('inotify').Inotify;
+    var Inotify = require('inotify-remastered').Inotify;
     var inotify = new Inotify(); //persistent by default, new Inotify(false) //no persistent
 
     var data = {}; //used to correlate two events
