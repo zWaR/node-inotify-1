@@ -24,7 +24,7 @@ namespace NodeInotify {
 		auto context = isolate->GetCurrentContext();	
 		Local<Function> fn = t->GetFunction(context).ToLocalChecked();
 
-		exports->Set(Nan::New<String>("Inotify").ToLocalChecked(), fn);
+		exports->Set(context, Nan::New<String>("Inotify").ToLocalChecked(), fn);
 
 		// Constants initialization
 		NODE_DEFINE_CONSTANT(fn, IN_ACCESS); //File was accessed (read)
