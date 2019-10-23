@@ -1,6 +1,6 @@
 {
   "name": "inotify-remastered",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": "Lazar Dilov <ldilov@yahoo.com>",
   "email": "ldilov@yahoo.com",
   "keywords": [
@@ -20,7 +20,7 @@
     "linux"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "main": "inotify",
   "dependencies": {
