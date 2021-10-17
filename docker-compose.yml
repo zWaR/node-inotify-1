@@ -1,6 +1,9 @@
 version: '3'
 
-services: 
+services:
   node:
+    volumes:
+      - ./Debug/:/usr/src/inotify/build/Debug
+      - ./Release/:/usr/src/inotify/build/Release
     build: .
-    command: yarn test
+    command: npm run test

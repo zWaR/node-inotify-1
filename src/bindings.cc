@@ -12,7 +12,7 @@ namespace NodeInotify {
 		Local<FunctionTemplate> t = Nan::New<FunctionTemplate>(New);
 		t->SetClassName(Nan::New<String>("Inotify").ToLocalChecked());
 		t->InstanceTemplate()->SetInternalFieldCount(1);
-		
+
 		Nan::SetPrototypeMethod(t, "addWatch", Inotify::AddWatch);
 		Nan::SetPrototypeMethod(t, "removeWatch", Inotify::RemoveWatch);
 		Nan::SetPrototypeMethod(t, "close", Inotify::Close);
@@ -21,10 +21,13 @@ namespace NodeInotify {
 		Nan::SetAccessor(object_tmpl, Nan::New<String>("persistent").ToLocalChecked(), Inotify::GetPersistent);
 
 		Isolate* isolate = v8::Isolate::GetCurrent();
-		auto context = isolate->GetCurrentContext();	
+		auto context = isolate->GetCurrentContext();
 		Local<Function> fn = t->GetFunction(context).ToLocalChecked();
 
-		exports->Set(context, Nan::New<String>("Inotify").ToLocalChecked(), fn);
+		if (exports->Set(context, Nan::New<String>("Inotify").ToLocalChecked(), fn).IsJust() == false) {
+			return Nan::ThrowTypeError("Set Inotify failed.");
+		}
+
 
 		// Constants initialization
 		NODE_DEFINE_CONSTANT(fn, IN_ACCESS); //File was accessed (read)
@@ -185,7 +188,9 @@ namespace NodeInotify {
 		Local<Integer> descriptor = Nan::New<Integer>(watch_descriptor);
 
 		//Local<Function> callback = Local<Function>::Cast(args_->Get(callback_sym));
-		inotify->handle()->Set(context, descriptor, args_->Get(context, callback_sym).ToLocalChecked());
+		if (inotify->handle()->Set(context, descriptor, args_->Get(context, callback_sym).ToLocalChecked()).IsJust() == false) {
+			return Nan::ThrowTypeError("Setting callback failed.");
+		}
 
 		info.GetReturnValue().Set(descriptor);
 	}
@@ -263,19 +268,27 @@ namespace NodeInotify {
 		Nan::TryCatch try_catch;
 
 		int sz = 0;
-		
+
 		while ((sz = read(inotify->fd, buffer, BUF_LEN)) > 0) {
 			struct inotify_event *event;
 			for (unsigned int i = 0; i <= (sz-EVENT_SIZE); i += (EVENT_SIZE + event->len)) {
 				event = (struct inotify_event *) &buffer[i];
 
 				Local<Object> obj = Nan::New<Object>();
-				obj->Set(context, Nan::New<String>("watch").ToLocalChecked(), Nan::New<Integer>(event->wd));
-				obj->Set(context, Nan::New<String>("mask").ToLocalChecked(), Nan::New<Integer>(event->mask));
-				obj->Set(context, Nan::New<String>("cookie").ToLocalChecked(), Nan::New<Integer>(event->cookie));
+				if (obj->Set(context, Nan::New<String>("watch").ToLocalChecked(), Nan::New<Integer>(event->wd)).IsJust() == false) {
+					return Nan::ThrowTypeError("Setting watch failed");
+				}
+				if (obj->Set(context, Nan::New<String>("mask").ToLocalChecked(), Nan::New<Integer>(event->mask)).IsJust() == false) {
+					return Nan::ThrowTypeError("Setting mask failed");
+				}
+				if (obj->Set(context, Nan::New<String>("cookie").ToLocalChecked(), Nan::New<Integer>(event->cookie)).IsJust() == false) {
+					return Nan::ThrowTypeError("Setting cookie failed");
+				}
 
 				if(event->len) {
-					obj->Set(context, Nan::New<String>("name").ToLocalChecked(), Nan::New<String>(event->name).ToLocalChecked());
+					if (obj->Set(context, Nan::New<String>("name").ToLocalChecked(), Nan::New<String>(event->name).ToLocalChecked()).IsJust() == false) {
+						return Nan::ThrowTypeError("Setting name failed");
+					}
 				}
 				argv[0] = obj;
 
@@ -293,7 +306,9 @@ namespace NodeInotify {
 				if(event->mask & IN_IGNORED) {
 					//deleting callback because the watch was removed
 					Local<Value> wd = Nan::New<Integer>(event->wd);
-					handle->Delete(context, wd->ToString(context).ToLocalChecked());
+					if (handle->Delete(context, wd->ToString(context).ToLocalChecked()).IsJust() == false) {
+						return Nan::ThrowTypeError("Deleting context failed");
+					}
 				}
 
 				if (try_catch.HasCaught()) {

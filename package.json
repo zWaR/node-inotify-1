@@ -1,6 +1,6 @@
 {
   "name": "inotify-remastered",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "author": "Lazar Dilov <ldilov@yahoo.com>",
   "email": "ldilov@yahoo.com",
   "keywords": [
@@ -25,7 +25,7 @@
   "main": "inotify",
   "dependencies": {
     "bindings": "~1.5.0",
-    "nan": "^2.14.0"
+    "nan": "^2.15.0"
   },
   "scripts": {
     "test": "node-gyp configure build"

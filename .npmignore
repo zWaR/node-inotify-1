@@ -5,4 +5,5 @@ node_modules
 Vagrantfile
 docker-compose.yml
 dockerfile
-
+Debug
+Release

@@ -9,15 +9,19 @@ namespace NodeInotify {
         Local<Context> context = Nan::New<Context>(reinterpret_cast<ExtensionConfiguration *>(NULL), global);
         Inotify::Initialize(exports);
 
-        exports->Set(context, Nan::New<String>("version").ToLocalChecked(),
+        v8::Maybe<bool> result = exports->Set(context, Nan::New<String>("version").ToLocalChecked(),
                     Nan::New<String>(NODE_INOTIFY_VERSION).ToLocalChecked());
 
+        if (result.IsJust() == false) {
+            return Nan::ThrowTypeError("Setting node inotify version failed");
+        }
 
-       
-       
+
         Context::Scope context_scope(context);
 
-        context->Global()->Set(context, Nan::New<String>("Inotify").ToLocalChecked(), exports);
+        if (context->Global()->Set(context, Nan::New<String>("Inotify").ToLocalChecked(), exports).IsJust() == false) {
+            return Nan::ThrowTypeError("Setting Inotify globally failed");
+        }
     }
 
     extern "C" void init (Local<Object> exports) {

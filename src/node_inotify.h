@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "nan.h"
-#define NODE_INOTIFY_VERSION "1.3.0"
+#define NODE_INOTIFY_VERSION "1.4.0"
 
 using namespace v8;
 using namespace node;

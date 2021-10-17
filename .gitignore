@@ -5,3 +5,5 @@ build
 *.swp
 *.swo
 *.swn
+Debug
+Release
